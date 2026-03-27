@@ -1,0 +1,885 @@
+@font-face {
+  font-family: "AlibabaSans";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("//mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*1GSgSYDD_aIAAAAAQsAAAAgAegCCAQ/AlibabaSans-Light.woff2")
+    format("woff2");
+}
+@font-face {
+  font-family: "AlibabaSans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("//mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*2zEUQqnPNesAAAAAQtAAAAgAegCCAQ/AlibabaSans-Regular.woff2")
+    format("woff2");
+}
+@font-face {
+  font-family: "AlibabaSans";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("//mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*E_cxRbMlZqUAAAAAQuAAAAgAegCCAQ/AlibabaSans-Medium.woff2")
+    format("woff2");
+}
+@font-face {
+  font-family: "AlibabaSans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("//mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*E_cxRbMlZqUAAAAAQuAAAAgAegCCAQ/AlibabaSans-Bold.woff2")
+    format("woff2");
+}
+@font-face {
+  font-family: "AlibabaSans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("//mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*E_cxRbMlZqUAAAAAQuAAAAgAegCCAQ/AlibabaSans-Heavy.woff2")
+    format("woff2");
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family:
+    AlibabaSans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+.colorWeak {
+  filter: invert(80%);
+}
+
+.ant-layout {
+  min-height: 100vh;
+}
+.ant-pro-sider.ant-layout-sider.ant-pro-sider-fixed {
+  left: unset;
+}
+
+canvas {
+  display: block;
+}
+
+body {
+  background:
+    radial-gradient(circle at top, rgba(14, 116, 144, 0.08), transparent 32%),
+    linear-gradient(180deg, #f6f8fb 0%, #eef3f9 100%);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+.saas-page-container {
+  .ant-pro-page-container-children-container {
+    padding: 20px 24px 32px;
+  }
+
+  .ant-card,
+  .ant-pro-card {
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    border-radius: 18px;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+  }
+
+  .ant-form-vertical .ant-form-item-label > label,
+  .ant-form-horizontal .ant-form-item-label > label {
+    font-weight: 600;
+  }
+}
+
+.saas-inline-form {
+  padding-inline-end: 20px;
+
+  .ant-form-item {
+    margin-bottom: 18px;
+  }
+
+  .ant-form-item-row {
+    align-items: flex-start;
+  }
+
+  .ant-form-item-label {
+    padding-inline-end: 12px;
+    overflow: hidden;
+    text-align: right;
+  }
+
+  .ant-form-item-label > label {
+    min-height: 40px;
+    color: #0f172a;
+    width: 100%;
+    justify-content: flex-end;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ant-input,
+  .ant-input-affix-wrapper,
+  .ant-input-number,
+  .ant-input-number-affix-wrapper,
+  .ant-picker,
+  .ant-select-selector,
+  .ant-input-textarea,
+  .ant-input-textarea textarea {
+    border-radius: 12px;
+  }
+
+  .ant-form-item-control-input {
+    min-height: 40px;
+  }
+
+  .ant-form-item-explain-error {
+    font-size: 12px;
+  }
+}
+
+.saas-resource-page {
+  .ant-pro-table {
+    overflow: hidden;
+  }
+
+  .ant-pro-table-search {
+    margin-bottom: 16px;
+  }
+
+  .ant-pro-query-filter .ant-form-item-label {
+    padding-inline-end: 12px;
+    overflow: hidden;
+    text-align: right;
+  }
+
+  .ant-pro-query-filter .ant-form-item-label > label {
+    width: 100%;
+    justify-content: flex-end;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ant-pro-card-body {
+    overflow-x: auto;
+  }
+
+  .ant-table-wrapper {
+    min-width: 100%;
+  }
+
+  .ant-table-cell {
+    vertical-align: top;
+  }
+}
+
+.saas-form-modal {
+  .ant-modal-content {
+    border-radius: 24px;
+    overflow: hidden;
+  }
+
+  .ant-modal-header {
+    margin-bottom: 8px;
+  }
+}
+
+.saas-auth-form {
+  .ant-pro-form-login-container {
+    border-radius: 28px;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.1);
+  }
+}
+
+.saas-workflow-page {
+  .ant-table-wrapper {
+    width: 100%;
+  }
+
+  .ant-table-cell {
+    vertical-align: top;
+  }
+}
+
+.saas-file-center {
+  .saas-file-center__overview {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .saas-file-center__side-grid {
+    display: grid;
+    grid-template-columns: minmax(300px, 1.2fr) minmax(220px, 1fr) minmax(220px, 1fr);
+    gap: 16px;
+  }
+
+  .saas-file-center__policy,
+  .saas-file-center__metrics {
+    height: 100%;
+  }
+
+  .saas-file-center__file-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    height: 52px;
+    padding-inline: 10px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(22, 119, 255, 0.16), rgba(14, 165, 233, 0.14));
+    color: #0f3d96;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+
+  .saas-file-center__pending-list {
+    display: grid;
+    gap: 12px;
+    max-height: 320px;
+    overflow: auto;
+    margin-top: 14px;
+  }
+
+  .saas-file-center__pending-item {
+    padding: 12px 14px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 16px;
+    background: rgba(248, 250, 252, 0.9);
+  }
+}
+
+.saas-workflow-halo-card,
+.saas-workflow-panel-card,
+.saas-workflow-hero-card,
+.saas-workflow-sidekick-card,
+.saas-workflow-toolbar-card {
+  border-radius: 24px;
+  border: 1px solid #edf2f7;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
+}
+
+.saas-workflow-halo-card {
+  background:
+    radial-gradient(circle at top left, rgba(34, 197, 94, 0.14), transparent 32%),
+    linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.saas-workflow-panel-card {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+}
+
+.saas-workflow-panel-card--designer {
+  overflow: hidden;
+}
+
+.saas-workflow-hero-card {
+  background:
+    radial-gradient(circle at top left, rgba(14, 165, 233, 0.18), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(34, 197, 94, 0.12), transparent 30%),
+    linear-gradient(135deg, #0f172a 0%, #14324d 48%, #164e63 100%);
+
+  .ant-card-body {
+    color: #fff;
+  }
+
+  .ant-typography,
+  .ant-statistic,
+  .ant-statistic-content,
+  .ant-statistic-content-value,
+  .ant-statistic-content-suffix {
+    color: #fff !important;
+  }
+
+  .ant-typography-secondary {
+    color: rgba(255, 255, 255, 0.78) !important;
+  }
+}
+
+.saas-workflow-hero-card__stat {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+
+  span {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 12px;
+  }
+
+  strong {
+    color: #fff;
+    font-size: 15px;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+}
+
+.saas-workflow-sidekick-card {
+  background:
+    radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 26%),
+    linear-gradient(180deg, #ffffff 0%, #f5fbff 100%);
+}
+
+.saas-workflow-toolbar-card {
+  background:
+    radial-gradient(circle at top left, rgba(14, 165, 233, 0.08), transparent 28%),
+    linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+}
+
+.saas-workflow-toolbar-card__inner {
+  display: grid;
+  gap: 18px;
+}
+
+.saas-workflow-toolbar-card__group {
+  display: grid;
+  gap: 12px;
+}
+
+.saas-workflow-studio {
+  display: grid;
+  grid-template-columns: minmax(340px, 380px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.saas-workflow-studio__toolbar-card,
+.saas-workflow-studio__sidebar,
+.saas-workflow-studio__main {
+  border-radius: 24px;
+
+  .ant-card-body {
+    height: 100%;
+  }
+}
+
+.saas-workflow-studio__toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.saas-workflow-studio__filters {
+  display: grid;
+  gap: 12px;
+}
+
+.saas-workflow-definitions__filters {
+  min-width: min(100%, 520px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.saas-workflow-drafts__filters {
+  min-width: min(100%, 420px);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.saas-workflow-studio__active-row {
+  td {
+    background: #f0f9ff !important;
+  }
+}
+
+.saas-workflow-studio__sidebar-tabs {
+  .ant-tabs-content-holder {
+    min-height: 760px;
+  }
+
+  .ant-tabs-tabpane {
+    height: 100%;
+  }
+}
+
+.saas-workflow-studio__draft-list {
+  .ant-list-items {
+    display: grid;
+    gap: 10px;
+  }
+}
+
+.saas-workflow-studio__draft-item {
+  padding: 14px 16px !important;
+  border: 1px solid #eef2f6;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    border-color: #91d5ff;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    transform: translateY(-1px);
+  }
+}
+
+.saas-workflow-studio__draft-item--active {
+  border-color: #22c55e;
+  box-shadow: 0 12px 28px rgba(34, 197, 94, 0.12);
+}
+
+.saas-workflow-draft-grid {
+  margin-top: 20px;
+
+  .ant-list-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+  }
+}
+
+.saas-workflow-draft-grid__item {
+  margin: 0 !important;
+}
+
+.saas-workflow-draft-card {
+  height: 100%;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 30%),
+    linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border: 1px solid #eaf1f7;
+}
+
+.saas-workflow-draft-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.saas-workflow-draft-card__meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+
+  div {
+    display: grid;
+    gap: 4px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(248, 250, 252, 0.92);
+  }
+
+  span {
+    color: rgba(15, 23, 42, 0.55);
+    font-size: 12px;
+  }
+
+  strong {
+    color: #0f172a;
+    font-size: 14px;
+    word-break: break-word;
+  }
+}
+
+.saas-workflow-draft-card__remark {
+  min-height: 44px;
+  margin-bottom: 0;
+}
+
+.saas-workflow-studio__main {
+  min-width: 0;
+}
+
+.saas-workflow-studio__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.saas-workflow-studio__tabs {
+  .ant-tabs-content-holder {
+    min-height: 760px;
+  }
+}
+
+.saas-workflow-designer-nav {
+  margin-bottom: 0;
+
+  .ant-tabs-nav {
+    margin-bottom: 10px;
+  }
+
+  .ant-tabs-tab {
+    padding-inline: 18px;
+    border-radius: 999px;
+  }
+}
+
+.saas-workflow-designer-tabs {
+  .ant-tabs-nav {
+    margin-bottom: 0;
+  }
+}
+
+.saas-workflow-studio__xml {
+  display: grid;
+  gap: 12px;
+}
+
+.saas-workflow-studio__xml-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.saas-workflow-studio__xml-editor {
+  textarea {
+    min-height: 700px !important;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+}
+
+.saas-workflow-designer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 16px;
+  min-height: 720px;
+}
+
+.saas-workflow-designer--canvas-only {
+  grid-template-columns: minmax(0, 1fr);
+  min-height: auto;
+}
+
+.saas-workflow-designer--collapsed {
+  grid-template-columns: minmax(0, 1fr);
+
+  .saas-workflow-designer__panel {
+    display: none;
+  }
+}
+
+.saas-workflow-designer__canvas-shell {
+  min-width: 0;
+  border: 1px solid #eef2f6;
+  border-radius: 22px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(14, 165, 233, 0.08), transparent 28%),
+    linear-gradient(180deg, #f8fbff 0%, #fff 100%);
+}
+
+.saas-workflow-designer__canvas {
+  height: 720px;
+  min-width: 0;
+}
+
+.saas-workflow-designer__canvas .djs-container,
+.saas-workflow-designer__canvas .djs-minimap {
+  background: transparent;
+}
+
+.saas-workflow-designer__canvas .djs-palette {
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.saas-workflow-designer__panel {
+  padding: 20px;
+  border: 1px solid #eef2f6;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #fcfdff 0%, #f7fbff 100%);
+  max-height: 720px;
+  overflow: auto;
+}
+
+.saas-workflow-designer__section-card {
+  border-radius: 18px;
+  border-color: #e8eef5;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.saas-workflow-designer__panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.saas-workflow-designer__field {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.saas-workflow-designer__field-label {
+  padding-top: 6px;
+  text-align: right;
+  color: rgba(15, 23, 42, 0.75);
+  white-space: nowrap;
+}
+
+.saas-workflow-designer__field-control {
+  min-width: 0;
+}
+
+.saas-workflow-designer__list {
+  display: grid;
+  gap: 10px;
+}
+
+.saas-workflow-designer__list-item {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid #e8eef5;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+}
+
+.saas-workflow-designer__list-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.saas-workflow-designer__switch-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.saas-workflow-process-form {
+  padding-inline-end: 0;
+}
+
+.saas-workflow-canvas-header,
+.saas-workflow-side-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.saas-workflow-node-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+
+  div {
+    display: grid;
+    gap: 4px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid #eaf1f7;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  }
+
+  span {
+    color: rgba(15, 23, 42, 0.55);
+    font-size: 12px;
+  }
+
+  strong {
+    color: #0f172a;
+    font-size: 14px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+}
+
+.saas-workflow-form-list {
+  .ant-list-items {
+    display: grid;
+    gap: 10px;
+  }
+}
+
+.saas-workflow-form-list__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid #eaf1f7;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    border-color: #91d5ff;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    transform: translateY(-1px);
+  }
+}
+
+.saas-workflow-form-list__item--active {
+  border-color: #22c55e;
+  box-shadow: 0 12px 28px rgba(34, 197, 94, 0.12);
+}
+
+.saas-workflow-form-list__meta {
+  display: grid;
+  gap: 4px;
+
+  span {
+    color: rgba(15, 23, 42, 0.55);
+    font-size: 12px;
+  }
+}
+
+.saas-message-center__channel-list {
+  display: grid;
+  gap: 12px;
+}
+
+.saas-message-center__channel-item,
+.saas-message-center__list-item {
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid #e8eef5;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+}
+
+.saas-message-center__channel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.saas-message-center__read-rate {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(19, 194, 194, 0.08), rgba(24, 144, 255, 0.06));
+}
+
+.saas-message-center__quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .saas-page-container {
+    .ant-pro-page-container-children-container {
+      padding: 16px 16px 24px;
+    }
+  }
+
+  .ant-table {
+    width: 100%;
+    overflow-x: auto;
+    &-thead > tr,
+    &-tbody > tr {
+      > th,
+      > td {
+        white-space: pre;
+        > span {
+          display: block;
+        }
+      }
+    }
+  }
+
+  .saas-inline-form {
+    padding-inline-end: 12px;
+
+    .ant-form-item-label {
+      padding-inline-end: 8px;
+    }
+  }
+
+  .saas-workflow-studio {
+    grid-template-columns: 1fr;
+  }
+
+  .saas-workflow-definitions__filters {
+    grid-template-columns: 1fr;
+    min-width: 0;
+  }
+
+  .saas-workflow-drafts__filters {
+    min-width: 0;
+  }
+
+  .saas-workflow-studio__toolbar,
+  .saas-workflow-studio__xml-actions,
+  .saas-workflow-studio__meta,
+  .saas-workflow-canvas-header,
+  .saas-workflow-side-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .saas-workflow-draft-grid {
+    .ant-list-items {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .saas-workflow-draft-card__meta {
+    grid-template-columns: 1fr;
+  }
+
+  .saas-workflow-node-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .saas-workflow-designer,
+  .saas-workflow-designer--collapsed {
+    grid-template-columns: 1fr;
+  }
+
+  .saas-workflow-designer__canvas {
+    height: 560px;
+  }
+
+  .saas-workflow-designer__panel {
+    max-height: none;
+  }
+
+  .saas-workflow-designer__field {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .saas-workflow-designer__field-label {
+    text-align: left;
+    padding-top: 0;
+  }
+
+  .saas-workflow-designer__switch-row {
+    grid-template-columns: 1fr;
+  }
+
+  .saas-file-center {
+    .saas-file-center__overview,
+    .saas-file-center__side-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .saas-message-center__channel-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

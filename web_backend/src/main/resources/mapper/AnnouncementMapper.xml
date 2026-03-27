@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hiking.treasure.mapper.AnnouncementMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hiking.treasure.entity.Announcement">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="msg_content" property="msgContent" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="sender" property="sender" />
+        <result column="priority" property="priority" />
+        <result column="msg_category" property="msgCategory" />
+        <result column="msg_type" property="msgType" />
+        <result column="send_status" property="sendStatus" />
+        <result column="send_time" property="sendTime" />
+        <result column="cancel_time" property="cancelTime" />
+        <result column="del_flag" property="delFlag" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, title, msg_content, start_time, end_time, sender, priority, msg_category, msg_type, send_status, send_time, cancel_time, del_flag, create_by, create_time, update_by, update_time
+    </sql>
+
+</mapper>

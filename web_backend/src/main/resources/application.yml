@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: admin-template
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/admin_template?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:aA123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+flowable:
+  database-schema-update: true
+  async-executor-activate: false
+  eventregistry:
+    enabled: false
+  idm:
+    enabled: false
+
+server:
+  port: 8081
+
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: del_flag
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+app:
+  base:
+    path:
+      upload: ${APP_UPLOAD_PATH:${java.io.tmpdir}/admin-template/upload}
+
+  security:
+    password-policy:
+      min-length: ${APP_PASSWORD_MIN_LENGTH:8}
+      max-length: ${APP_PASSWORD_MAX_LENGTH:32}
+      require-uppercase: ${APP_PASSWORD_REQUIRE_UPPERCASE:true}
+      require-lowercase: ${APP_PASSWORD_REQUIRE_LOWERCASE:true}
+      require-digit: ${APP_PASSWORD_REQUIRE_DIGIT:true}
+      require-special: ${APP_PASSWORD_REQUIRE_SPECIAL:true}
+
+  jwt:
+    secret: ${APP_JWT_SECRET:replace-this-with-a-secure-env-secret}
+    exp-seconds: ${APP_JWT_EXP_SECONDS:3600}
+    refresh-exp-seconds: ${APP_JWT_REFRESH_EXP_SECONDS:1209600}

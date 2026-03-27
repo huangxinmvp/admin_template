@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="https://admin-template/workflow">
+    <process id="leaveApproval" name="请假审批" isExecutable="true">
+        <documentation>示例流程：发起人提交请假申请，由 approver 变量指定的审批人进行审批。</documentation>
+
+        <startEvent id="startEvent" name="发起申请" flowable:initiator="initiatorId"/>
+        <sequenceFlow id="flow_start_to_manager" sourceRef="startEvent" targetRef="managerApproval"/>
+
+        <userTask id="managerApproval"
+                  name="直属上级审批"
+                  flowable:assignee="${approver}">
+            <documentation>审批人需要在办理任务时传入 approved=true/false。</documentation>
+        </userTask>
+        <sequenceFlow id="flow_manager_to_gateway" sourceRef="managerApproval" targetRef="approvalGateway"/>
+
+        <exclusiveGateway id="approvalGateway" name="审批结果判断" default="flow_rejected"/>
+        <sequenceFlow id="flow_approved" sourceRef="approvalGateway" targetRef="approvedEnd">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == true}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_rejected" sourceRef="approvalGateway" targetRef="rejectedEnd"/>
+
+        <endEvent id="approvedEnd" name="审批通过"/>
+        <endEvent id="rejectedEnd" name="审批驳回"/>
+    </process>
+</definitions>

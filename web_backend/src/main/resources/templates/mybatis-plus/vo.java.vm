@@ -1,0 +1,16 @@
+package ${cfg.voPackage};
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Data
+@Schema(description = "${table.comment} - VO" )
+public class ${entity}VO {
+#foreach($field in $table.fields)
+    @Schema(description = "$!{field.comment}" )
+    private ${field.propertyType} ${field.propertyName};
+#end
+}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hiking.treasure.mapper.QuartzJobLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hiking.treasure.entity.QuartzJobLog">
+        <id column="id" property="id" />
+        <result column="job_id" property="jobId" />
+        <result column="job_name" property="jobName" />
+        <result column="job_group" property="jobGroup" />
+        <result column="invoke_target" property="invokeTarget" />
+        <result column="cron_expression" property="cronExpression" />
+        <result column="status" property="status" />
+        <result column="exception_info" property="exceptionInfo" />
+        <result column="cost_time" property="costTime" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, job_id, job_name, job_group, invoke_target, cron_expression, status, exception_info, cost_time, create_time
+    </sql>
+
+</mapper>

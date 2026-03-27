@@ -1,0 +1,129 @@
+package ${package.Controller};
+
+import java.util.Arrays;
+import java.util.List;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import ${package.Entity}.${entity};
+import ${package.Service}.${table.serviceName};
+import ${cfg.dtoPackage}.create.${entity}CreateDTO;
+import ${cfg.dtoPackage}.update.${entity}UpdateDTO;
+import ${cfg.dtoPackage}.query.${entity}QueryDTO;
+import ${cfg.voPackage}.${entity}VO;
+import ${cfg.convertPackage}.${entity}Convert;
+import ${cfg.baseControllerPackage}.BaseController;
+import ${cfg.resultClass};
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.web.servlet.ModelAndView;
+
+/**
+ * $!{table.comment} - 控制器
+ */
+@Tag(name = "$!{table.comment}", description = "$!{table.comment}接口" )
+@RestController
+@RequestMapping("${cfg.baseRequestMapping}/$!{table.entityPath}" )
+public class ${table.controllerName} extends BaseController<${entity}, ${table.serviceName}>{
+
+    #set($serviceBeanName = $table.serviceName.substring(0,1).toLowerCase() + $table.serviceName.substring(1))
+    @Resource
+    private ${table.serviceName} ${serviceBeanName};
+
+    @Resource
+    private ${entity}Convert ${table.entityPath}Convert;
+
+    #set($pkField = "" )
+    #foreach($f in $table.fields)
+        #if($f.keyFlag)
+            #set($pkField = $f)
+            #break
+        #end
+    #end
+    #if($pkField != "" )
+        #set($pkType = $pkField.propertyType)
+        #set($pkName = $pkField.propertyName)
+    #else
+        #set($pkType = "String" )
+        #set($pkName = "id" )
+    #end
+    #set($PkNameCap = $pkName.substring(0,1).toUpperCase() + $pkName.substring(1))
+
+    @Operation(summary = "分页查询" )
+    @GetMapping("/page" )
+    public ${cfg.resultSimpleName}<Page<${entity}VO>> page(@Valid ${entity}QueryDTO dto, @RequestParam(defaultValue = "1") long pageNo, @RequestParam(defaultValue = "10") long pageSize) {
+    LambdaQueryWrapper<${entity}> qw = new LambdaQueryWrapper<>();
+    ${entity} cond = ${table.entityPath}Convert.toEntity(dto);
+    qw.setEntity(cond);
+
+    Page<${entity}> page = new Page<>(pageNo, pageSize);
+    IPage<${entity}> entityPage = ${serviceBeanName}.page(page, qw);
+
+    List<${entity}VO> voList = ${table.entityPath}Convert.toVOs(entityPage.getRecords());
+    Page<${entity}VO> voPage = new Page<>(pageNo, pageSize, entityPage.getTotal());
+    voPage.setRecords(voList);
+
+    return ${cfg.resultSimpleName}.ok(voPage);
+}
+
+    @Operation(summary = "新增" )
+    @PostMapping
+    public ${cfg.resultSimpleName}<${entity}VO> create(@Valid @RequestBody ${entity}CreateDTO dto) {
+        ${entity} entity = ${table.entityPath}Convert.toEntity(dto);
+        ${serviceBeanName}.save(entity);
+        return ${cfg.resultSimpleName}.ok(${table.entityPath}Convert.toVO(entity));
+    }
+
+    @Operation(summary = "更新" )
+    @PutMapping("/{id}" )
+    public ${cfg.resultSimpleName}<Boolean> update(@PathVariable ${pkType} id,
+            @Valid @RequestBody ${entity}UpdateDTO dto) {
+        ${entity} entity = ${table.entityPath}Convert.toEntity(dto);
+        entity.set${PkNameCap}(id);
+        return ${cfg.resultSimpleName}.ok(${serviceBeanName}.updateById(entity));
+    }
+
+    @Operation(summary = "删除" )
+    @DeleteMapping("/{id}" )
+    public ${cfg.resultSimpleName}<Boolean> delete(@PathVariable ${pkType} id) {
+        return ${cfg.resultSimpleName}.ok(${serviceBeanName}.removeById(id));
+    }
+
+    @Operation(summary = "批量删除" )
+    @DeleteMapping
+    public ${cfg.resultSimpleName}<Boolean> deleteBatch(@RequestParam("ids") String ids) {
+        return ${cfg.resultSimpleName}.ok(${serviceBeanName}.removeByIds(Arrays.asList(ids.split(","))));
+    }
+
+    @Operation(summary = "详情" )
+    @GetMapping("/{id}" )
+    public ${cfg.resultSimpleName}<${entity}VO> detail(@PathVariable ${pkType} id) {
+        ${entity} entity = ${serviceBeanName}.getById(id);
+        return ${cfg.resultSimpleName}.ok(${table.entityPath}Convert.toVO(entity));
+    }
+
+    @Operation(summary = "导出Excel" )
+    @GetMapping("/exportXls" )
+    public ModelAndView exportXls(HttpServletRequest request, ${entity}QueryDTO dto) {
+        ${entity} cond = ${table.entityPath}Convert.toEntity(dto);
+        String exportFields = null;
+        Integer pageNumPerSheet = 500;
+        return super.exportXlsSheet(request, cond, ${entity}.class, "$!{table.comment}", exportFields, pageNumPerSheet);
+    }
+
+    @Operation(summary = "导入Excel" )
+    @PostMapping("/importExcel" )
+    public ${cfg.resultSimpleName}<String> importExcel(HttpServletRequest request, HttpServletResponse response) {
+        return super.importExcel(request, response, ${entity}.class);
+    }
+
+    @Override
+    protected ${table.serviceName} service() {
+        return this.${serviceBeanName};
+    }
+}

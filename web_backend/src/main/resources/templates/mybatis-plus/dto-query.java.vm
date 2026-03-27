@@ -1,0 +1,16 @@
+package ${cfg.dtoPackage}.query;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Data
+@Schema(description = "$!{table.comment} - 查询DTO" )
+public class ${entity}QueryDTO {
+#foreach($f in $table.fields)
+    @Schema(description = "$!{f.comment}" )
+    private ${f.propertyType} ${f.propertyName};
+#end
+}

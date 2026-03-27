@@ -1,0 +1,23 @@
+package ${cfg.dtoPackage}.update;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Data
+@Schema(description = "$!{table.comment} - 更新DTO" )
+public class ${entity}UpdateDTO {
+#foreach($field in $table.fields)
+#set($n = $field.propertyName.toLowerCase())
+#if($field.keyFlag)
+#else
+#if($n == "delflag" || $n == "createby" || $n == "createtime" || $n == "updateby" || $n == "updatetime")
+#else
+    @Schema(description = "$!{field.comment}" )
+    private ${field.propertyType} ${field.propertyName};
+#end
+#end
+#end
+}

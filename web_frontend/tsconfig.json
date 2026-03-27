@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "target": "esnext",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "declaration": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@@/*": ["./src/.umi/*"],
+      "@@test/*": ["./src/.umi-test/*"]
+    }
+  },
+  "include": ["./**/*.d.ts", "./**/*.ts", "./**/*.tsx"],
+  "exclude": [
+    "./src/pages/list/**",
+    "./src/pages/form/**",
+    "./src/pages/profile/**",
+    "./src/pages/result/**",
+    "./src/pages/exception/**",
+    "./src/pages/table-list/**",
+    "./src/pages/dashboard/monitor/**",
+    "./src/pages/dashboard/workplace/**",
+    "./src/pages/**/_mock.ts",
+    "./src/pages/Admin.tsx",
+    "./src/pages/Welcome.tsx"
+  ]
+}

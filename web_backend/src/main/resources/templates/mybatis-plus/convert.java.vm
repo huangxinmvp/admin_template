@@ -1,0 +1,23 @@
+package ${cfg.convertPackage};
+
+import org.mapstruct.Mapper;
+import ${package.Entity}.${entity};
+import ${cfg.dtoPackage}.create.${entity}CreateDTO;
+import ${cfg.dtoPackage}.update.${entity}UpdateDTO;
+import ${cfg.dtoPackage}.query.${entity}QueryDTO;
+import ${cfg.voPackage}.${entity}VO;
+
+import java.util.List;
+
+@Mapper(componentModel = "spring" )
+public interface ${entity}Convert {
+    ${entity} toEntity(${entity}CreateDTO dto);
+
+    ${entity} toEntity(${entity}UpdateDTO dto);
+
+    ${entity} toEntity(${entity}QueryDTO dto);
+
+    ${entity}VO toVO(${entity} entity);
+
+    List<${entity}VO> toVOs(List<${entity}> list);
+}
