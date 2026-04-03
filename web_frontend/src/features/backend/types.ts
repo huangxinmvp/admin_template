@@ -62,6 +62,7 @@ export interface ResourceConfig {
   idField?: string;
   fields: BackendFieldConfig[];
   allowCreate?: boolean;
+  allowView?: boolean;
   allowEdit?: boolean;
   allowDelete?: boolean;
   allowBatchDelete?: boolean;

@@ -1,6 +1,6 @@
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
-import { App, Button, Col, Empty, Form, Input, InputNumber, Row, Spin, Switch, Tabs, Tag, Typography } from 'antd';
+import { Alert, App, Button, Col, Empty, Form, Input, InputNumber, Row, Spin, Switch, Tabs, Tag, Typography } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   INLINE_FORM_LABEL_COL,
@@ -22,6 +22,8 @@ const toInitialValue = (item: SystemConfigItem) => {
       return value === 'true' || value === '1';
     case 'number':
       return value ? Number(value) : undefined;
+    case 'password':
+      return '';
     default:
       return value;
   }
@@ -46,9 +48,40 @@ const renderField = (item: SystemConfigItem) => {
       return <InputNumber min={0} precision={0} style={{ width: '100%' }} />;
     case 'textarea':
       return <TextArea placeholder={item.placeholder || undefined} rows={4} showCount maxLength={500} />;
+    case 'password':
+      return (
+        <Input.Password
+          autoComplete="new-password"
+          placeholder={item.placeholder || undefined}
+        />
+      );
     default:
       return <Input placeholder={item.placeholder || undefined} />;
   }
+};
+
+const toItemExtra = (item: SystemConfigItem) => {
+  const extras = [item.description].filter(Boolean);
+  if (item.environmentOverride) {
+    extras.push('当前值由环境变量覆盖；页面中的值仅用于说明有效来源。');
+  }
+  if (item.valueType === 'password' && item.configured) {
+    extras.push('当前已配置，留空则保持原值。');
+  }
+  return extras.join(' ');
+};
+
+const getValueSourceTag = (item: SystemConfigItem) => {
+  if (item.environmentOverride || item.valueSource === 'environment') {
+    return <Tag color="gold">环境变量覆盖</Tag>;
+  }
+  if (item.valueSource === 'database') {
+    return <Tag>数据库值</Tag>;
+  }
+  if (item.valueSource === 'default') {
+    return <Tag color="blue">默认值</Tag>;
+  }
+  return null;
 };
 
 const SystemConfigCenterPage: React.FC = () => {
@@ -93,25 +126,40 @@ const SystemConfigCenterPage: React.FC = () => {
         key: group.groupCode,
         label: group.groupName,
         children: (
-          <Row gutter={[16, 0]}>
-            {group.items.map((item) => (
-              <Col key={item.configKey} span={isFullRowType(item) ? 24 : 12}>
-                <Form.Item
-                  extra={item.description}
-                  label={item.configName}
-                  name={item.configKey}
-                  rules={
-                    item.requiredFlag
-                      ? [{ required: true, message: `请输入${item.configName}` }]
-                      : undefined
-                  }
-                  valuePropName={item.valueType === 'boolean' ? 'checked' : 'value'}
-                >
-                  {renderField(item)}
-                </Form.Item>
-              </Col>
-            ))}
-          </Row>
+          <>
+            {group.groupCode === 'toolIntegration' ? (
+              <Alert
+                description="工具集成 API Key 在当前版本会被掩码展示，但仍保存在系统配置表中。这适合开发、联调和受控演示，不等同生产级 secret manager。"
+                showIcon
+                style={{ marginBottom: 16 }}
+                type="warning"
+              />
+            ) : null}
+            <Row gutter={[16, 0]}>
+              {group.items.map((item) => (
+                <Col key={item.configKey} span={isFullRowType(item) ? 24 : 12}>
+                  <Form.Item
+                    extra={toItemExtra(item)}
+                    label={
+                      <Row align="middle" gutter={8} wrap={false}>
+                        <Col flex="auto">{item.configName}</Col>
+                        <Col>{getValueSourceTag(item)}</Col>
+                      </Row>
+                    }
+                    name={item.configKey}
+                    rules={
+                      item.requiredFlag
+                        ? [{ required: true, message: `请输入${item.configName}` }]
+                        : undefined
+                    }
+                    valuePropName={item.valueType === 'boolean' ? 'checked' : 'value'}
+                  >
+                    {renderField(item)}
+                  </Form.Item>
+                </Col>
+              ))}
+            </Row>
+          </>
         ),
       })),
     [groups],
@@ -169,7 +217,8 @@ const SystemConfigCenterPage: React.FC = () => {
             wrapperCol={INLINE_FORM_WRAPPER_COL}
           >
             <Typography.Paragraph type="secondary">
-              当前配置会优先覆盖服务端默认值；未填写的配置会自动回退到系统内置默认值。
+              当前配置按“环境变量 → 数据库配置 → 系统默认值”的优先级生效。敏感配置建议优先通过环境变量注入；当前数据库配置仍不等同生产级 secret
+              manager。
             </Typography.Paragraph>
             <Tabs items={tabs} />
           </Form>

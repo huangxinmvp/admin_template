@@ -9,9 +9,12 @@ public class SystemConfigItemVO {
     private String configValue;
     private String defaultValue;
     private String valueType;
+    private Boolean configured;
     private Integer requiredFlag;
     private String placeholder;
     private String description;
     private String optionsJson;
     private Integer sortNo;
+    private Boolean environmentOverride;
+    private String valueSource;
 }

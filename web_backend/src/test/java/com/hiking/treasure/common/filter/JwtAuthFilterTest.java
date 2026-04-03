@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hiking.treasure.common.exception.BusinessException;
 import com.hiking.treasure.common.util.JwtUtil;
 import com.hiking.treasure.entity.User;
+import com.hiking.treasure.entity.UserSession;
 import com.hiking.treasure.service.TenantService;
+import com.hiking.treasure.service.UserSessionService;
 import com.hiking.treasure.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -40,13 +42,15 @@ class JwtAuthFilterTest {
     @Mock
     private UserService userService;
     @Mock
+    private UserSessionService userSessionService;
+    @Mock
     private FilterChain filterChain;
 
     private JwtAuthFilter jwtAuthFilter;
 
     @BeforeEach
     void setUp() {
-        jwtAuthFilter = new JwtAuthFilter(jwtUtil, tenantService, userService, new ObjectMapper());
+        jwtAuthFilter = new JwtAuthFilter(jwtUtil, tenantService, userService, userSessionService, new ObjectMapper());
         SecurityContextHolder.clearContext();
     }
 
@@ -65,6 +69,8 @@ class JwtAuthFilterTest {
         when(claims.getSubject()).thenReturn("u1");
         when(claims.get("un")).thenReturn("admin");
         when(claims.get("tid")).thenReturn("t1");
+        when(claims.get("sid", String.class)).thenReturn("s1");
+        when(userSessionService.validateActiveSession("s1", "u1")).thenReturn(new UserSession().setId("s1"));
         when(tenantService.requireActiveTenant("t1")).thenThrow(new BusinessException(401, "租户不存在或已停用"));
 
         jwtAuthFilter.doFilter(request, response, filterChain);
@@ -93,6 +99,8 @@ class JwtAuthFilterTest {
         when(claims.getSubject()).thenReturn("u1");
         when(claims.get("un")).thenReturn("admin");
         when(claims.get("tid")).thenReturn("t1");
+        when(claims.get("sid", String.class)).thenReturn("s1");
+        when(userSessionService.validateActiveSession("s1", "u1")).thenReturn(new UserSession().setId("s1"));
         when(tenantService.requireActiveTenant("t1")).thenReturn(null);
         when(userService.getById("u1")).thenReturn(user);
 
@@ -123,6 +131,8 @@ class JwtAuthFilterTest {
         when(claims.getSubject()).thenReturn("u1");
         when(claims.get("un")).thenReturn("admin");
         when(claims.get("tid")).thenReturn("t1");
+        when(claims.get("sid", String.class)).thenReturn("s1");
+        when(userSessionService.validateActiveSession("s1", "u1")).thenReturn(new UserSession().setId("s1"));
         when(tenantService.requireActiveTenant("t1")).thenReturn(null);
         when(userService.getById("u1")).thenReturn(user);
 
@@ -154,7 +164,9 @@ class JwtAuthFilterTest {
         when(claims.getSubject()).thenReturn("u1");
         when(claims.get("un")).thenReturn("admin");
         when(claims.get("tid")).thenReturn("t1");
+        when(claims.get("sid", String.class)).thenReturn("s1");
         when(claims.getIssuedAt()).thenReturn(issuedAt);
+        when(userSessionService.validateActiveSession("s1", "u1")).thenReturn(new UserSession().setId("s1"));
         when(tenantService.requireActiveTenant("t1")).thenReturn(null);
         when(userService.getById("u1")).thenReturn(user);
 
@@ -181,6 +193,8 @@ class JwtAuthFilterTest {
         when(claims.getSubject()).thenReturn("u1");
         when(claims.get("un")).thenReturn("admin");
         when(claims.get("tid")).thenReturn("t1");
+        when(claims.get("sid", String.class)).thenReturn("s1");
+        when(userSessionService.validateActiveSession("s1", "u1")).thenReturn(new UserSession().setId("s1"));
         when(tenantService.requireActiveTenant("t1")).thenThrow(new BusinessException(400, "租户已过期"));
 
         jwtAuthFilter.doFilter(request, response, filterChain);

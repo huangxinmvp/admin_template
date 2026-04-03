@@ -9,6 +9,7 @@ import com.hiking.treasure.common.util.PasswordPolicyValidator;
 import com.hiking.treasure.domain.dto.UserChangePasswordDTO;
 import com.hiking.treasure.domain.vo.system.PasswordActionResultVO;
 import com.hiking.treasure.service.AuthService;
+import com.hiking.treasure.service.UserSessionService;
 import com.hiking.treasure.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +41,8 @@ class PasswordActionContractMvcTest {
     private PasswordUtil passwordUtil;
     @Mock
     private PasswordPolicyValidator passwordPolicyValidator;
+    @Mock
+    private UserSessionService userSessionService;
 
     private MockMvc mockMvc;
 
@@ -50,6 +53,7 @@ class PasswordActionContractMvcTest {
         ReflectionTestUtils.setField(userController, "userService", userService);
         ReflectionTestUtils.setField(userController, "passwordUtil", passwordUtil);
         ReflectionTestUtils.setField(userController, "passwordPolicyValidator", passwordPolicyValidator);
+        ReflectionTestUtils.setField(userController, "userSessionService", userSessionService);
 
         mockMvc = MockMvcBuilders.standaloneSetup(authController, userController)
                 .setControllerAdvice(new GlobalExceptionHandler())
@@ -64,7 +68,10 @@ class PasswordActionContractMvcTest {
     @Test
     void authChangePasswordReturnsReloginRequiredFlag() throws Exception {
         SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken(new LoginUser("u1", "admin", "t1", java.util.List.of("ADMIN")), null)
+                new UsernamePasswordAuthenticationToken(
+                        new LoginUser("u1", "admin", "t1", "s1", java.util.List.of("ADMIN")),
+                        null
+                )
         );
         when(authService.changeOwnPassword(eq("u1"), any(UserChangePasswordDTO.class)))
                 .thenReturn(PasswordActionResultVO.of(true, "密码已修改，请重新登录"));

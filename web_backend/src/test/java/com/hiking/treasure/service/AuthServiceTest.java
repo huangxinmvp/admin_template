@@ -10,10 +10,12 @@ import com.hiking.treasure.domain.vo.AuthVO;
 import com.hiking.treasure.domain.vo.system.PasswordActionResultVO;
 import com.hiking.treasure.entity.Tenant;
 import com.hiking.treasure.entity.User;
+import com.hiking.treasure.entity.UserSession;
 import com.hiking.treasure.mapper.UserDepartMapper;
 import com.hiking.treasure.mapper.UserRoleMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,9 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,6 +58,8 @@ class AuthServiceTest {
     private JwtUtil jwtUtil;
     @Mock
     private PasswordPolicyValidator passwordPolicyValidator;
+    @Mock
+    private UserSessionService userSessionService;
 
     @InjectMocks
     private AuthService authService;
@@ -75,17 +79,25 @@ class AuthServiceTest {
         when(userService.getRoleCodes("u1")).thenReturn(List.of("ADMIN"));
         when(userService.getDepartIds("u1")).thenReturn(List.of("d1"));
         when(permissionService.listPermissionCodesByUserId("u1")).thenReturn(List.of("sys:user:view", "sys:tenant:view"));
-        when(jwtUtil.createAccessToken(eq("u1"), eq("admin"), eq("t1"), eq(List.of("ADMIN")), eq(List.of("sys:user:view", "sys:tenant:view"))))
+        when(jwtUtil.createAccessToken(
+                eq("u1"),
+                eq("admin"),
+                eq("t1"),
+                eq("s1"),
+                eq(List.of("ADMIN")),
+                eq(List.of("sys:user:view", "sys:tenant:view"))
+        ))
                 .thenReturn("access-token");
-        when(jwtUtil.createRefreshToken("u1")).thenReturn("refresh-token");
+        when(jwtUtil.createRefreshToken("u1", "s1")).thenReturn("refresh-token");
         when(tenantService.requireActiveTenant("t1")).thenReturn(tenant);
 
-        AuthVO authVO = authService.buildAuthVO(user);
+        AuthVO authVO = authService.buildAuthVO(user, "s1");
 
         assertEquals("u1", authVO.getUserId());
         assertEquals("t1", authVO.getTenantId());
         assertEquals("acme", authVO.getTenantCode());
         assertEquals("Acme", authVO.getTenantName());
+        assertEquals("s1", authVO.getSessionId());
         assertIterableEquals(List.of("ADMIN"), authVO.getRoles());
         assertIterableEquals(List.of("d1"), authVO.getDepts());
         assertIterableEquals(List.of("sys:user:view", "sys:tenant:view"), authVO.getPermissions());
@@ -105,12 +117,13 @@ class AuthServiceTest {
         LoginDTO dto = new LoginDTO();
         dto.setUsername("admin");
         dto.setPassword("Admin@123456");
+        HttpServletRequest request = mock(HttpServletRequest.class);
 
         when(userService.getByUsername("admin")).thenReturn(user);
         when(encoder.matches("Admin@123456", "encoded")).thenReturn(true);
         when(tenantService.requireActiveTenant("t1")).thenThrow(new BusinessException(400, "租户不存在或已停用"));
 
-        BusinessException exception = assertThrows(BusinessException.class, () -> authService.login(dto));
+        BusinessException exception = assertThrows(BusinessException.class, () -> authService.login(dto, request));
 
         assertEquals("租户不存在或已停用", exception.getMessage());
         verify(userService, never()).updateById(user);
@@ -129,10 +142,11 @@ class AuthServiceTest {
         LoginDTO dto = new LoginDTO();
         dto.setUsername("admin");
         dto.setPassword("Admin@123456");
+        HttpServletRequest request = mock(HttpServletRequest.class);
 
         when(userService.getByUsername("admin")).thenReturn(user);
 
-        BusinessException exception = assertThrows(BusinessException.class, () -> authService.login(dto));
+        BusinessException exception = assertThrows(BusinessException.class, () -> authService.login(dto, request));
 
         assertEquals("账号已被锁定，请稍后再试", exception.getMessage());
         assertEquals(ErrorCode.USER_LOCKED.getKey(), exception.getErrorKey());
@@ -150,15 +164,19 @@ class AuthServiceTest {
         @SuppressWarnings("unchecked")
         Jws<Claims> jws = org.mockito.Mockito.mock(Jws.class);
         Claims claims = org.mockito.Mockito.mock(Claims.class);
+        UserSession session = new UserSession().setId("s1").setUserId("u1");
+        HttpServletRequest request = mock(HttpServletRequest.class);
 
         when(jwtUtil.parse("refresh-token")).thenReturn(jws);
         when(jws.getBody()).thenReturn(claims);
         when(claims.get("rt")).thenReturn(Boolean.TRUE);
         when(claims.getSubject()).thenReturn("u1");
+        when(claims.get("sid", String.class)).thenReturn("s1");
+        when(userSessionService.validateActiveSession("s1", "u1")).thenReturn(session);
         when(userService.getById("u1")).thenReturn(user);
         when(tenantService.requireActiveTenant("t1")).thenThrow(new BusinessException(400, "租户不存在或已停用"));
 
-        BusinessException exception = assertThrows(BusinessException.class, () -> authService.refresh("refresh-token"));
+        BusinessException exception = assertThrows(BusinessException.class, () -> authService.refresh("refresh-token", request));
 
         assertEquals("租户不存在或已停用", exception.getMessage());
         verify(userService, never()).updateById(user);
@@ -177,15 +195,19 @@ class AuthServiceTest {
         Jws<Claims> jws = org.mockito.Mockito.mock(Jws.class);
         Claims claims = org.mockito.Mockito.mock(Claims.class);
         Date issuedAt = Date.from(LocalDateTime.now().minusHours(1).atZone(ZoneId.systemDefault()).toInstant());
+        UserSession session = new UserSession().setId("s1").setUserId("u1");
+        HttpServletRequest request = mock(HttpServletRequest.class);
 
         when(jwtUtil.parse("refresh-token")).thenReturn(jws);
         when(jws.getBody()).thenReturn(claims);
         when(claims.get("rt")).thenReturn(Boolean.TRUE);
         when(claims.getSubject()).thenReturn("u1");
+        when(claims.get("sid", String.class)).thenReturn("s1");
         when(claims.getIssuedAt()).thenReturn(issuedAt);
+        when(userSessionService.validateActiveSession("s1", "u1")).thenReturn(session);
         when(userService.getById("u1")).thenReturn(user);
 
-        BusinessException exception = assertThrows(BusinessException.class, () -> authService.refresh("refresh-token"));
+        BusinessException exception = assertThrows(BusinessException.class, () -> authService.refresh("refresh-token", request));
 
         assertEquals("凭证已失效，请重新登录", exception.getMessage());
         verify(userService, never()).updateById(user);

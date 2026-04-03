@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {"configValue", "defaultValue"})
 @Accessors(chain = true)
 @TableName("sys_system_config")
 public class SystemConfig implements Serializable {

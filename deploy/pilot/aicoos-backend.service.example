@@ -1,0 +1,18 @@
+[Unit]
+Description=AICoOS Spring Boot Backend
+After=network.target aicoos-agent-runtime.service
+Wants=aicoos-agent-runtime.service
+
+[Service]
+Type=simple
+User=aicoos
+Group=aicoos
+WorkingDirectory=/opt/aicoos
+EnvironmentFile=/opt/aicoos/deploy/pilot/backend.env
+ExecStart=/opt/aicoos/scripts/start_backend_pilot.sh
+Restart=on-failure
+RestartSec=5
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target

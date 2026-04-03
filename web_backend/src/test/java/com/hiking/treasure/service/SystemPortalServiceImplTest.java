@@ -5,6 +5,7 @@ import com.hiking.treasure.domain.vo.system.MenuTreeVO;
 import com.hiking.treasure.entity.Permission;
 import com.hiking.treasure.entity.Tenant;
 import com.hiking.treasure.entity.User;
+import com.hiking.treasure.modules.phase1.service.ProjectService;
 import com.hiking.treasure.service.impl.SystemPortalServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,8 @@ class SystemPortalServiceImplTest {
     private AnnouncementService announcementService;
     @Mock
     private QuartzJobService quartzJobService;
+    @Mock
+    private ProjectService projectService;
 
     @AfterEach
     void clearSecurityContext() {
@@ -46,7 +49,11 @@ class SystemPortalServiceImplTest {
     @Test
     void getCurrentUserMenusBuildsSortedTree() {
         SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken(new LoginUser("u1", "admin", "t1", List.of("ADMIN")), null, List.of())
+                new UsernamePasswordAuthenticationToken(
+                        new LoginUser("u1", "admin", "t1", "s1", List.of("ADMIN")),
+                        null,
+                        List.of()
+                )
         );
 
         Permission root = new Permission();
@@ -72,7 +79,7 @@ class SystemPortalServiceImplTest {
         when(permissionService.listMenuByUserId("u1")).thenReturn(List.of(childB, root, childA));
 
         SystemPortalServiceImpl service = new SystemPortalServiceImpl(
-                userService, permissionService, tenantService, roleService, departService, announcementService, quartzJobService
+                userService, permissionService, tenantService, roleService, departService, announcementService, quartzJobService, projectService
         );
 
         List<MenuTreeVO> menus = service.getCurrentUserMenus();
@@ -85,7 +92,11 @@ class SystemPortalServiceImplTest {
     @Test
     void getCurrentUserProfileIncludesTenantAndPermissions() {
         SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken(new LoginUser("u1", "admin", "t1", List.of("ADMIN")), null, List.of())
+                new UsernamePasswordAuthenticationToken(
+                        new LoginUser("u1", "admin", "t1", "s1", List.of("ADMIN")),
+                        null,
+                        List.of()
+                )
         );
 
         User user = new User();
@@ -105,7 +116,7 @@ class SystemPortalServiceImplTest {
         when(tenantService.requireActiveTenant("t1")).thenReturn(tenant);
 
         SystemPortalServiceImpl service = new SystemPortalServiceImpl(
-                userService, permissionService, tenantService, roleService, departService, announcementService, quartzJobService
+                userService, permissionService, tenantService, roleService, departService, announcementService, quartzJobService, projectService
         );
 
         var profile = service.getCurrentUserProfile();

@@ -68,6 +68,128 @@ const dataRuleConditionOptions = [
   { label: 'between', value: 'between' },
 ];
 
+const projectTypeOptions = [
+  { label: '交付项目', value: 'delivery' },
+  { label: '咨询项目', value: 'consulting' },
+  { label: '内部项目', value: 'internal' },
+];
+
+const riskLevelOptions = [
+  { label: '低', value: 'low' },
+  { label: '中', value: 'medium' },
+  { label: '高', value: 'high' },
+  { label: '关键', value: 'critical' },
+];
+
+const projectStatusOptions = [
+  { label: '草稿', value: 'draft' },
+  { label: '进行中', value: 'active' },
+  { label: '已暂停', value: 'paused' },
+  { label: '已完成', value: 'completed' },
+  { label: '已取消', value: 'cancelled' },
+];
+
+const lifecycleStageOptions = [
+  { label: '需求接收', value: 'intake' },
+  { label: '需求澄清', value: 'clarification' },
+  { label: '可行性评估', value: 'feasibility' },
+  { label: '预算估算', value: 'estimation' },
+  { label: '审批', value: 'approval' },
+  { label: '计划', value: 'planning' },
+  { label: '设计', value: 'design' },
+  { label: '开发', value: 'development' },
+  { label: '测试', value: 'testing' },
+  { label: '发布审批', value: 'release_approval' },
+  { label: '发布', value: 'release' },
+  { label: '复盘', value: 'retrospective' },
+];
+
+const projectStageStatusOptions = [
+  { label: '待开始', value: 'pending' },
+  { label: '进行中', value: 'active' },
+  { label: '已完成', value: 'completed' },
+  { label: '已阻塞', value: 'blocked' },
+];
+
+const gateStatusOptions = [
+  { label: '无需门禁', value: 'not_required' },
+  { label: '待确认', value: 'pending' },
+  { label: '已通过', value: 'approved' },
+  { label: '已拒绝', value: 'rejected' },
+];
+
+const decisionItemTypeOptions = [
+  { label: '澄清事项', value: 'clarification' },
+  { label: '范围变更', value: 'scope_change' },
+  { label: '预算变更', value: 'budget_change' },
+  { label: '发布决策', value: 'release' },
+];
+
+const decisionPriorityOptions = [
+  { label: '低', value: 'low' },
+  { label: '中', value: 'medium' },
+  { label: '高', value: 'high' },
+  { label: '关键', value: 'critical' },
+];
+
+const decisionItemStatusOptions = [
+  { label: '待处理', value: 'open' },
+  { label: '待审批', value: 'pending_approval' },
+  { label: '已批准', value: 'approved' },
+  { label: '已拒绝', value: 'rejected' },
+  { label: '已解决', value: 'resolved' },
+];
+
+const approvalTypeOptions = [
+  { label: '需求审批', value: 'requirement' },
+  { label: '预算审批', value: 'budget' },
+  { label: '关卡审批', value: 'gate' },
+  { label: '发布审批', value: 'release' },
+];
+
+const approvalStatusOptions = [
+  { label: '草稿', value: 'draft' },
+  { label: '已提交', value: 'submitted' },
+  { label: '已批准', value: 'approved' },
+  { label: '已拒绝', value: 'rejected' },
+  { label: '已取消', value: 'cancelled' },
+];
+
+const budgetPlanStatusOptions = [
+  { label: '草稿', value: 'draft' },
+  { label: '待审批', value: 'pending_approval' },
+  { label: '已批准', value: 'approved' },
+  { label: '已关闭', value: 'closed' },
+];
+
+const budgetLedgerEntryTypeOptions = [
+  { label: '预算创建', value: 'create' },
+  { label: '预算锁定', value: 'lock' },
+  { label: '待增补预算', value: 'pending_increase' },
+  { label: '人工修正', value: 'manual_correction' },
+  { label: '预算预留', value: 'reserve' },
+  { label: '预算消耗', value: 'consume' },
+  { label: '预算调整', value: 'adjust' },
+  { label: '预算回退', value: 'refund' },
+];
+
+const agentRoleCategoryOptions = [
+  { label: '治理角色', value: 'governance' },
+  { label: '交付角色', value: 'delivery' },
+  { label: '支持角色', value: 'support' },
+];
+
+const agentRoleStatusOptions = [
+  { label: '启用', value: 'active' },
+  { label: '停用', value: 'inactive' },
+];
+
+const workflowTemplateStatusOptions = [
+  { label: '草稿', value: 'draft' },
+  { label: '启用', value: 'active' },
+  { label: '归档', value: 'archived' },
+];
+
 const resourceConfigs: ResourceConfig[] = [
   {
     key: 'users',
@@ -667,6 +789,398 @@ const resourceConfigs: ResourceConfig[] = [
       field('requestUrl', '请求地址'),
       field('requestType', '请求方式'),
       field('costTime', '耗时(ms)', { type: 'number' }),
+      field('createTime', '创建时间', {
+        type: 'datetime',
+        hideInForm: true,
+      }),
+    ],
+  },
+  {
+    key: 'aicoos-projects',
+    path: '/aicoos/projects',
+    title: '项目中心',
+    description: 'AICoOS Phase 1 项目治理骨架，覆盖项目、阶段模板与预算配置入口。',
+    resourcePath: '/api/aicoos/project',
+    allowImport: false,
+    allowExport: false,
+    fields: [
+      field('id', 'ID', {
+        hideInForm: true,
+        hideInSearch: true,
+        copyable: true,
+        width: 180,
+      }),
+      field('projectCode', '项目编码', { required: true }),
+      field('projectName', '项目名称', { required: true }),
+      field('projectType', '项目类型', {
+        type: 'select',
+        required: true,
+        options: projectTypeOptions,
+      }),
+      field('intakeSummary', '需求摘要', {
+        type: 'textarea',
+      }),
+      field('currentStageCode', '当前阶段', {
+        type: 'select',
+        options: lifecycleStageOptions,
+      }),
+      field('status', '项目状态', {
+        type: 'select',
+        options: projectStatusOptions,
+      }),
+      field('riskLevel', '风险等级', {
+        type: 'select',
+        options: riskLevelOptions,
+      }),
+      field('ownerUserId', '项目负责人', {
+        type: 'select',
+        loadOptions: () => queryPageOptions('/api/user', 'username'),
+      }),
+      field('workflowTemplateId', '工作流模板', {
+        type: 'select',
+        loadOptions: () => queryPageOptions('/api/aicoos/workflowTemplate', 'templateName'),
+      }),
+      field('remark', '备注', {
+        type: 'textarea',
+        hideInTable: true,
+      }),
+      field('createTime', '创建时间', {
+        type: 'datetime',
+        hideInForm: true,
+      }),
+      field('updateTime', '更新时间', {
+        type: 'datetime',
+        hideInForm: true,
+        hideInTable: true,
+      }),
+    ],
+  },
+  {
+    key: 'aicoos-project-stages',
+    path: '/aicoos/project-stages',
+    title: '项目阶段',
+    description: '维护项目阶段、门禁状态与责任人，为后续治理流转提供结构骨架。',
+    resourcePath: '/api/aicoos/projectStage',
+    allowImport: false,
+    allowExport: false,
+    fields: [
+      field('id', 'ID', {
+        hideInForm: true,
+        hideInSearch: true,
+        copyable: true,
+        width: 180,
+      }),
+      field('projectId', '所属项目', {
+        type: 'select',
+        required: true,
+        loadOptions: () => queryPageOptions('/api/aicoos/project', 'projectName'),
+      }),
+      field('stageCode', '阶段编码', {
+        type: 'select',
+        required: true,
+        options: lifecycleStageOptions,
+      }),
+      field('stageName', '阶段名称', { required: true }),
+      field('stageOrder', '阶段顺序', { type: 'number' }),
+      field('stageStatus', '阶段状态', {
+        type: 'select',
+        options: projectStageStatusOptions,
+      }),
+      field('gateStatus', '门禁状态', {
+        type: 'select',
+        options: gateStatusOptions,
+      }),
+      field('ownerUserId', '阶段负责人', {
+        type: 'select',
+        loadOptions: () => queryPageOptions('/api/user', 'username'),
+      }),
+      field('startedAt', '开始时间', { type: 'datetime' }),
+      field('endedAt', '结束时间', { type: 'datetime' }),
+      field('remark', '备注', {
+        type: 'textarea',
+        hideInTable: true,
+      }),
+      field('createTime', '创建时间', {
+        type: 'datetime',
+        hideInForm: true,
+      }),
+    ],
+  },
+  {
+    key: 'aicoos-decision-items',
+    path: '/aicoos/decision-items',
+    title: '决策事项',
+    description: '承载需求澄清、范围变更、预算调整等待确认事项的管理骨架。',
+    resourcePath: '/api/aicoos/decisionItem',
+    allowImport: false,
+    allowExport: false,
+    fields: [
+      field('id', 'ID', {
+        hideInForm: true,
+        hideInSearch: true,
+        copyable: true,
+        width: 180,
+      }),
+      field('projectId', '所属项目', {
+        type: 'select',
+        required: true,
+        loadOptions: () => queryPageOptions('/api/aicoos/project', 'projectName'),
+      }),
+      field('projectStageId', '所属阶段', {
+        type: 'select',
+        loadOptions: () => queryPageOptions('/api/aicoos/projectStage', 'stageName'),
+      }),
+      field('title', '事项标题', { required: true }),
+      field('itemType', '事项类型', {
+        type: 'select',
+        options: decisionItemTypeOptions,
+      }),
+      field('priority', '优先级', {
+        type: 'select',
+        options: decisionPriorityOptions,
+      }),
+      field('status', '事项状态', {
+        type: 'select',
+        options: decisionItemStatusOptions,
+      }),
+      field('requestedByUserId', '发起人', {
+        type: 'select',
+        loadOptions: () => queryPageOptions('/api/user', 'username'),
+      }),
+      field('assigneeUserId', '处理人', {
+        type: 'select',
+        loadOptions: () => queryPageOptions('/api/user', 'username'),
+      }),
+      field('dueAt', '到期时间', { type: 'datetime' }),
+      field('remark', '备注', {
+        type: 'textarea',
+        hideInTable: true,
+      }),
+      field('createTime', '创建时间', {
+        type: 'datetime',
+        hideInForm: true,
+      }),
+    ],
+  },
+  {
+    key: 'aicoos-approval-records',
+    path: '/aicoos/approval-records',
+    title: '审批记录',
+    description: '管理项目治理中的预算、关卡、发布等审批记录骨架。',
+    resourcePath: '/api/aicoos/approvalRecord',
+    allowImport: false,
+    allowExport: false,
+    fields: [
+      field('id', 'ID', {
+        hideInForm: true,
+        hideInSearch: true,
+        copyable: true,
+        width: 180,
+      }),
+      field('projectId', '所属项目', {
+        type: 'select',
+        loadOptions: () => queryPageOptions('/api/aicoos/project', 'projectName'),
+      }),
+      field('decisionItemId', '决策事项', {
+        type: 'select',
+        loadOptions: () => queryPageOptions('/api/aicoos/decisionItem', 'title'),
+      }),
+      field('approvalType', '审批类型', {
+        type: 'select',
+        options: approvalTypeOptions,
+      }),
+      field('approverUserId', '审批人', {
+        type: 'select',
+        loadOptions: () => queryPageOptions('/api/user', 'username'),
+      }),
+      field('approvalStatus', '审批状态', {
+        type: 'select',
+        options: approvalStatusOptions,
+      }),
+      field('submittedAt', '提交时间', { type: 'datetime' }),
+      field('decidedAt', '决策时间', { type: 'datetime' }),
+      field('decisionNote', '决策说明', {
+        type: 'textarea',
+      }),
+      field('remark', '备注', {
+        type: 'textarea',
+        hideInTable: true,
+      }),
+      field('createTime', '创建时间', {
+        type: 'datetime',
+        hideInForm: true,
+      }),
+    ],
+  },
+  {
+    key: 'aicoos-budget-plans',
+    path: '/aicoos/budget-plans',
+    title: '预算计划',
+    description: '配置项目的 Token 预算计划、审批状态与资金占用概览骨架。',
+    resourcePath: '/api/aicoos/budgetPlan',
+    allowImport: false,
+    allowExport: false,
+    fields: [
+      field('id', 'ID', {
+        hideInForm: true,
+        hideInSearch: true,
+        copyable: true,
+        width: 180,
+      }),
+      field('projectId', '所属项目', {
+        type: 'select',
+        required: true,
+        loadOptions: () => queryPageOptions('/api/aicoos/project', 'projectName'),
+      }),
+      field('planName', '计划名称', { required: true }),
+      field('currencyCode', '币种', { required: true }),
+      field('proposedAmount', '提议金额', { type: 'number' }),
+      field('approvedAmount', '批准金额', { type: 'number' }),
+      field('reservedAmount', '预留金额', { type: 'number' }),
+      field('consumedAmount', '已消耗金额', { type: 'number' }),
+      field('roleAllocationsJson', '角色预算分配', {
+        type: 'textarea',
+        hideInTable: true,
+      }),
+      field('status', '状态', {
+        type: 'select',
+        options: budgetPlanStatusOptions,
+      }),
+      field('effectiveAt', '生效时间', { type: 'datetime' }),
+      field('remark', '备注', {
+        type: 'textarea',
+        hideInTable: true,
+      }),
+      field('createTime', '创建时间', {
+        type: 'datetime',
+        hideInForm: true,
+      }),
+    ],
+  },
+  {
+    key: 'aicoos-budget-ledgers',
+    path: '/aicoos/budget-ledgers',
+    title: '预算流水',
+    description: '记录预算预留、消耗、调整与退款等流水骨架。',
+    resourcePath: '/api/aicoos/budgetLedger',
+    allowImport: false,
+    allowExport: false,
+    fields: [
+      field('id', 'ID', {
+        hideInForm: true,
+        hideInSearch: true,
+        copyable: true,
+        width: 180,
+      }),
+      field('projectId', '所属项目', {
+        type: 'select',
+        loadOptions: () => queryPageOptions('/api/aicoos/project', 'projectName'),
+      }),
+      field('budgetPlanId', '预算计划', {
+        type: 'select',
+        loadOptions: () => queryPageOptions('/api/aicoos/budgetPlan', 'planName'),
+      }),
+      field('entryType', '流水类型', {
+        type: 'select',
+        options: budgetLedgerEntryTypeOptions,
+      }),
+      field('amount', '金额', { type: 'number' }),
+      field('balanceAfter', '流水后余额', { type: 'number' }),
+      field('referenceType', '关联对象类型'),
+      field('referenceId', '关联对象ID'),
+      field('occurredAt', '发生时间', { type: 'datetime' }),
+      field('description', '描述', {
+        type: 'textarea',
+      }),
+      field('remark', '备注', {
+        type: 'textarea',
+        hideInTable: true,
+      }),
+      field('createTime', '创建时间', {
+        type: 'datetime',
+        hideInForm: true,
+      }),
+    ],
+  },
+  {
+    key: 'aicoos-agent-roles',
+    path: '/aicoos/agent-roles',
+    title: 'Agent 角色',
+    description: '维护 AICoOS 中的角色分类、能力摘要与审批约束骨架。',
+    resourcePath: '/api/aicoos/agentRole',
+    allowImport: false,
+    allowExport: false,
+    fields: [
+      field('id', 'ID', {
+        hideInForm: true,
+        hideInSearch: true,
+        copyable: true,
+        width: 180,
+      }),
+      field('roleCode', '角色编码', { required: true }),
+      field('roleName', '角色名称', { required: true }),
+      field('roleCategory', '角色分类', {
+        type: 'select',
+        options: agentRoleCategoryOptions,
+      }),
+      field('status', '状态', {
+        type: 'select',
+        options: agentRoleStatusOptions,
+      }),
+      field('capabilitySummary', '能力摘要', {
+        type: 'textarea',
+      }),
+      field('approvalRequired', '需要审批', {
+        type: 'select',
+        options: yesNoOptions,
+      }),
+      field('maxConcurrency', '最大并发数', {
+        type: 'number',
+      }),
+      field('remark', '备注', {
+        type: 'textarea',
+        hideInTable: true,
+      }),
+      field('createTime', '创建时间', {
+        type: 'datetime',
+        hideInForm: true,
+      }),
+    ],
+  },
+  {
+    key: 'aicoos-workflow-templates',
+    path: '/aicoos/workflow-templates',
+    title: '工作流模板',
+    description: '维护 AICoOS 阶段治理模板，为后续流程映射和规则配置预留骨架。',
+    resourcePath: '/api/aicoos/workflowTemplate',
+    allowImport: false,
+    allowExport: false,
+    fields: [
+      field('id', 'ID', {
+        hideInForm: true,
+        hideInSearch: true,
+        copyable: true,
+        width: 180,
+      }),
+      field('templateCode', '模板编码', { required: true }),
+      field('templateName', '模板名称', { required: true }),
+      field('versionNo', '版本号', { type: 'number' }),
+      field('stageCount', '阶段数量', { type: 'number' }),
+      field('status', '状态', {
+        type: 'select',
+        options: workflowTemplateStatusOptions,
+      }),
+      field('defaultFlag', '默认模板', {
+        type: 'select',
+        options: yesNoOptions,
+      }),
+      field('description', '描述', {
+        type: 'textarea',
+      }),
+      field('remark', '备注', {
+        type: 'textarea',
+        hideInTable: true,
+      }),
       field('createTime', '创建时间', {
         type: 'datetime',
         hideInForm: true,

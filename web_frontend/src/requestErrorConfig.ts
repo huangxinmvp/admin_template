@@ -30,8 +30,32 @@ interface ResponseStructure {
 }
 
 let refreshPromise: Promise<string | undefined> | null = null;
+const REQUEST_ID_HEADER = 'X-Request-Id';
 
 const getApiBaseUrl = () => process.env.REACT_APP_API_BASE_URL || '';
+
+const createRequestId = () => {
+  if (typeof globalThis !== 'undefined' && globalThis.crypto?.randomUUID) {
+    return globalThis.crypto.randomUUID();
+  }
+  return `req-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+};
+
+const getResponseRequestId = (response: any) => {
+  const headers = response?.headers;
+  if (!headers) {
+    return undefined;
+  }
+  if (typeof headers.get === 'function') {
+    return headers.get(REQUEST_ID_HEADER) || headers.get(REQUEST_ID_HEADER.toLowerCase()) || undefined;
+  }
+  return headers[REQUEST_ID_HEADER] || headers[REQUEST_ID_HEADER.toLowerCase()];
+};
+
+const withRequestId = (messageText: string, response?: any) => {
+  const requestId = getResponseRequestId(response);
+  return requestId ? `${messageText}（请求ID: ${requestId}）` : messageText;
+};
 
 const buildApiUrl = (path: string) => {
   if (/^https?:\/\//.test(path)) {
@@ -68,6 +92,7 @@ const refreshAccessToken = async () => {
             method: 'POST',
             headers: {
               Accept: 'application/json',
+              [REQUEST_ID_HEADER]: createRequestId(),
             },
           },
         );
@@ -130,18 +155,18 @@ export const errorConfig = {
               message.warning(errorMessage);
               break;
             case ErrorShowType.ERROR_MESSAGE:
-              message.error(errorMessage);
+              message.error(withRequestId(errorMessage || '请求失败', error.response));
               break;
             case ErrorShowType.NOTIFICATION:
               notification.open({
-                description: errorMessage,
+                description: withRequestId(errorMessage || '', error.response),
                 message: errorCode,
               });
               break;
             case ErrorShowType.REDIRECT:
               break;
             default:
-              message.error(errorMessage);
+              message.error(withRequestId(errorMessage || '请求失败', error.response));
           }
         }
       } else if (error.response) {
@@ -150,14 +175,14 @@ export const errorConfig = {
             error.response?.data?.message || error.response?.data?.errorMessage;
           clearAuthSession();
           redirectToLogin();
-          message.error(responseMessage || '登录已失效，请重新登录');
+          message.error(withRequestId(responseMessage || '登录已失效，请重新登录', error.response));
           return;
         }
         if (error.response.status === 403) {
-          message.error('当前账号没有访问权限');
+          message.error(withRequestId('当前账号没有访问权限', error.response));
           return;
         }
-        message.error(`请求失败，状态码：${error.response.status}`);
+        message.error(withRequestId(`请求失败，状态码：${error.response.status}`, error.response));
       } else if (error.request) {
         message.error('服务暂时不可用，请稍后重试');
       } else {
@@ -176,6 +201,11 @@ export const errorConfig = {
       const headers = {
         ...(config.headers || {}),
       };
+      if (!headers[REQUEST_ID_HEADER] && !headers[REQUEST_ID_HEADER.toLowerCase()]) {
+        Object.assign(headers, {
+          [REQUEST_ID_HEADER]: createRequestId(),
+        });
+      }
 
       let token = getAccessToken();
       if (!shouldSkipAuth && token && isAccessTokenExpiringSoon()) {

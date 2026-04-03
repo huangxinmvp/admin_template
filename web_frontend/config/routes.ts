@@ -198,6 +198,84 @@ export default [
     ],
   },
   {
+    path: '/aicoos',
+    name: 'AICoOS',
+    icon: 'appstore',
+    routes: [
+      {
+        path: '/aicoos',
+        redirect: '/aicoos/projects',
+      },
+      {
+        name: '项目中心',
+        path: '/aicoos/projects',
+        component: './aicoos/projects',
+      },
+      {
+        name: '需求接收',
+        path: '/aicoos/requirement-intake',
+        component: './aicoos/requirement-intake',
+      },
+      {
+        name: '澄清中心',
+        path: '/aicoos/clarification-center',
+        component: './aicoos/clarification-center',
+      },
+      {
+        name: '项目阶段',
+        path: '/aicoos/project-stages',
+        component: './resource',
+      },
+      {
+        name: '决策中心',
+        path: '/aicoos/decision-center',
+        component: './aicoos/decision-center',
+      },
+      {
+        path: '/aicoos/decision-items',
+        redirect: '/aicoos/decision-center',
+        hideInMenu: true,
+      },
+      {
+        name: '审批中心',
+        path: '/aicoos/approval-center',
+        component: './aicoos/approval-center',
+      },
+      {
+        path: '/aicoos/approval-records',
+        redirect: '/aicoos/approval-center',
+        hideInMenu: true,
+      },
+      {
+        name: '预算中心',
+        path: '/aicoos/budget-center',
+        component: './aicoos/budget-center',
+      },
+      {
+        name: '预算计划',
+        path: '/aicoos/budget-plans',
+        component: './resource',
+        hideInMenu: true,
+      },
+      {
+        name: '预算流水',
+        path: '/aicoos/budget-ledgers',
+        component: './resource',
+        hideInMenu: true,
+      },
+      {
+        name: 'Agent 角色',
+        path: '/aicoos/agent-roles',
+        component: './aicoos/agent-role-management',
+      },
+      {
+        name: '工作流模板',
+        path: '/aicoos/workflow-templates',
+        component: './aicoos/workflow-template-center',
+      },
+    ],
+  },
+  {
     path: '/account',
     name: '我的账户',
     icon: 'user',

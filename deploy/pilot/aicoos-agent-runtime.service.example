@@ -1,0 +1,17 @@
+[Unit]
+Description=AICoOS Agent Runtime
+After=network.target
+
+[Service]
+Type=simple
+User=aicoos
+Group=aicoos
+WorkingDirectory=/opt/aicoos
+EnvironmentFile=/opt/aicoos/deploy/pilot/agent_runtime.env
+ExecStart=/opt/aicoos/scripts/start_agent_runtime_pilot.sh
+Restart=on-failure
+RestartSec=5
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target

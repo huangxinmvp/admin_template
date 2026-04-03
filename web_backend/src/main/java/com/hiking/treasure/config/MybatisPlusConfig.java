@@ -19,7 +19,10 @@ import java.util.Set;
  * MyBatis 配置类
  */
 @Configuration
-@MapperScan("com.hiking.treasure.mapper")
+@MapperScan({
+        "com.hiking.treasure.mapper",
+        "com.hiking.treasure.modules.phase1.mapper"
+})
 public class MybatisPlusConfig {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
@@ -42,7 +45,26 @@ public class MybatisPlusConfig {
                     "sys_announcement_send",
                     "sys_file",
                     "sys_quartz_job",
-                    "sys_quartz_job_log"
+                    "sys_quartz_job_log",
+                    "ai_project",
+                    "ai_project_stage",
+                    "ai_decision_item",
+                    "ai_approval_record",
+                    "ai_budget_plan",
+                    "ai_budget_ledger",
+                    "ai_agent_role",
+                    "ai_agent_role_stage_participation",
+                    "ai_agent_role_allowed_action",
+                    "ai_workflow_template",
+                    "ai_workflow_template_stage",
+                    "ai_requirement_intake",
+                    "ai_clarification_item",
+                    "ai_decision_action_log",
+                    "ai_approval_action_log",
+                    "ai_project_governance_state",
+                    "ai_meeting_record",
+                    "ai_project_tool_binding",
+                    "ai_tool_integration_audit"
             );
 
             @Override

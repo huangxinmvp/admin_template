@@ -1,0 +1,156 @@
+services:
+  mysql:
+    image: ${MYSQL_IMAGE:-mysql:8.4}
+    restart: unless-stopped
+    stop_grace_period: ${PILOT_MYSQL_STOP_GRACE_PERIOD:-60s}
+    logging:
+      driver: json-file
+      options:
+        max-size: ${PILOT_LOG_MAX_SIZE:-10m}
+        max-file: "${PILOT_LOG_MAX_FILE:-3}"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set in compose.env}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-admin_template}
+      MYSQL_USER: ${MYSQL_APP_USER:-aicoos_app}
+      MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD:?set in compose.env}
+      TZ: ${TZ:-Asia/Shanghai}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+08:00
+    ports:
+      - "${PILOT_DB_BIND_HOST:-127.0.0.1}:${PILOT_DB_PORT:-3306}:3306"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - aicoos-pilot
+
+  agent_runtime:
+    image: ${AGENT_RUNTIME_IMAGE:-aicoos-agent-runtime:pilot}
+    build:
+      context: ../..
+      dockerfile: deploy/pilot/agent_runtime.Dockerfile
+      args:
+        RUNTIME_BASE_IMAGE: ${RUNTIME_BASE_IMAGE:-docker.m.daocloud.io/library/python:3.12-slim}
+    restart: unless-stopped
+    init: true
+    stop_grace_period: ${PILOT_RUNTIME_STOP_GRACE_PERIOD:-20s}
+    logging:
+      driver: json-file
+      options:
+        max-size: ${PILOT_LOG_MAX_SIZE:-10m}
+        max-file: "${PILOT_LOG_MAX_FILE:-3}"
+    env_file:
+      - ${AGENT_RUNTIME_ENV_FILE:-./agent_runtime.env}
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      AGENT_RUNTIME_HOST: 0.0.0.0
+      AGENT_RUNTIME_PORT: 8091
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8091/health').read()",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+    ports:
+      - "${PILOT_RUNTIME_BIND_HOST:-127.0.0.1}:${PILOT_RUNTIME_PORT:-8091}:8091"
+    networks:
+      aicoos-pilot:
+        aliases:
+          - agent-runtime
+
+  backend:
+    image: ${BACKEND_IMAGE:-aicoos-backend:pilot}
+    build:
+      context: ../..
+      dockerfile: deploy/pilot/backend.Dockerfile
+      args:
+        BACKEND_BASE_IMAGE: ${BACKEND_BASE_IMAGE:-docker.m.daocloud.io/library/maven:3.9.9-eclipse-temurin-21}
+    restart: unless-stopped
+    init: true
+    stop_grace_period: ${PILOT_BACKEND_STOP_GRACE_PERIOD:-45s}
+    logging:
+      driver: json-file
+      options:
+        max-size: ${PILOT_LOG_MAX_SIZE:-10m}
+        max-file: "${PILOT_LOG_MAX_FILE:-3}"
+    env_file:
+      - ${BACKEND_ENV_FILE:-./backend.env}
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      JAVA_TOOL_OPTIONS: -Duser.timezone=${TZ:-Asia/Shanghai}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      agent_runtime:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8081/api/system/health >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
+    ports:
+      - "${PILOT_BACKEND_BIND_HOST:-127.0.0.1}:${PILOT_BACKEND_PORT:-8081}:8081"
+    networks:
+      - aicoos-pilot
+
+  frontend:
+    image: ${FRONTEND_IMAGE:-aicoos-frontend:pilot}
+    build:
+      context: ../..
+      dockerfile: deploy/pilot/frontend.Dockerfile
+      args:
+        REACT_APP_API_BASE_URL: ${FRONTEND_API_BASE_URL:-}
+        FRONTEND_NODE_BASE_IMAGE: ${FRONTEND_NODE_BASE_IMAGE:-docker.m.daocloud.io/library/node:20-bookworm-slim}
+        FRONTEND_NGINX_BASE_IMAGE: ${FRONTEND_NGINX_BASE_IMAGE:-docker.m.daocloud.io/library/nginx:1.27-alpine}
+    restart: unless-stopped
+    init: true
+    stop_grace_period: ${PILOT_FRONTEND_STOP_GRACE_PERIOD:-15s}
+    logging:
+      driver: json-file
+      options:
+        max-size: ${PILOT_LOG_MAX_SIZE:-10m}
+        max-file: "${PILOT_LOG_MAX_FILE:-3}"
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O- http://127.0.0.1/ >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+    ports:
+      - "${PILOT_FRONTEND_BIND_HOST:-0.0.0.0}:${PILOT_FRONTEND_PORT:-8080}:80"
+    networks:
+      - aicoos-pilot
+
+networks:
+  aicoos-pilot:
+    name: ${AICOOS_NETWORK_NAME:-aicoos-pilot}
+
+volumes:
+  mysql-data:
+    name: ${MYSQL_VOLUME_NAME:-aicoos-pilot-mysql-data}

@@ -1,5 +1,7 @@
 package com.hiking.treasure.common.api.vo;
 
+import com.hiking.treasure.common.web.RequestCorrelation;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
@@ -15,6 +17,7 @@ public class Result<T> implements Serializable {
     /** 错误标识 */           private String errorKey;
     /** 数据 */               private T result;
     /** 时间戳 */             private long timestamp = Instant.now().toEpochMilli();
+    /** 请求追踪ID */         private String requestId = RequestCorrelation.currentRequestId();
 
     public Result() {}
 
@@ -48,4 +51,6 @@ public class Result<T> implements Serializable {
     public void setResult(T result) { this.result = result; }
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+    public String getRequestId() { return requestId; }
+    public void setRequestId(String requestId) { this.requestId = requestId; }
 }

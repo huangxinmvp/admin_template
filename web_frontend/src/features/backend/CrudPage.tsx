@@ -13,7 +13,17 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import dayjs from 'dayjs';
-import { Button, Popconfirm, Result, Space, Tag, Typography, message } from 'antd';
+import {
+  Button,
+  Descriptions,
+  Drawer,
+  Popconfirm,
+  Result,
+  Space,
+  Tag,
+  Typography,
+  message,
+} from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   createResource,
@@ -102,14 +112,69 @@ const toFormValues = (
   return next;
 };
 
-const renderSummaryValue = (value: unknown) => {
-  if (Array.isArray(value)) {
-    return value.join(', ');
+const findOptionLabel = (options: OptionItem[] | undefined, value: unknown) => {
+  if (!options?.length || value === null || value === undefined || value === '') {
+    return undefined;
   }
+  return options.find((item) => String(item.value) === String(value))?.label;
+};
+
+const findTreeOptionLabel = (
+  options: TreeOption[] | undefined,
+  value: unknown,
+): string | undefined => {
+  if (!options?.length || value === null || value === undefined || value === '') {
+    return undefined;
+  }
+
+  for (const item of options) {
+    if (String(item.value) === String(value)) {
+      return String(item.label ?? item.title ?? item.value);
+    }
+    const childMatch = findTreeOptionLabel(item.children, value);
+    if (childMatch) {
+      return childMatch;
+    }
+  }
+
+  return undefined;
+};
+
+const formatSingleFieldValue = (
+  field: BackendFieldConfig,
+  value: unknown,
+  optionsMap: Record<string, OptionItem[]>,
+  treeOptionsMap: Record<string, TreeOption[]>,
+) => {
   if (value === null || value === undefined || value === '') {
     return '-';
   }
+
+  if (field.type === 'select' || field.type === 'multiselect') {
+    return findOptionLabel(field.options || optionsMap[field.name], value) || String(value);
+  }
+
+  if (field.type === 'treeSelect' || field.type === 'treeMultiselect') {
+    return findTreeOptionLabel(treeOptionsMap[field.name], value) || String(value);
+  }
+
   return String(value);
+};
+
+const formatFieldValue = (
+  field: BackendFieldConfig,
+  value: unknown,
+  optionsMap: Record<string, OptionItem[]>,
+  treeOptionsMap: Record<string, TreeOption[]>,
+) => {
+  if (Array.isArray(value)) {
+    const labels = value
+      .map((item) => formatSingleFieldValue(field, item, optionsMap, treeOptionsMap))
+      .filter((item) => item !== '-');
+    return labels.length ? labels.join(', ') : '-';
+  }
+
+  return formatSingleFieldValue(field, value, optionsMap, treeOptionsMap);
 };
 
 const isFullRowField = (field: BackendFieldConfig) =>
@@ -331,6 +396,13 @@ const renderFormField = (
   }
 };
 
+const getOrderedFormFields = (fields: BackendFieldConfig[]) => {
+  const visibleFields = fields.filter((item) => !item.hideInForm);
+  const regularFields = visibleFields.filter((item) => item.type !== 'textarea');
+  const textAreaFields = visibleFields.filter((item) => item.type === 'textarea');
+  return [...regularFields, ...textAreaFields];
+};
+
 export const CrudPage: React.FC<{ resource: ResourceConfig }> = ({
   resource,
 }) => {
@@ -339,6 +411,9 @@ export const CrudPage: React.FC<{ resource: ResourceConfig }> = ({
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [currentRecord, setCurrentRecord] = useState<GenericRecord>();
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailRecord, setDetailRecord] = useState<GenericRecord>();
+  const [detailLoading, setDetailLoading] = useState(false);
   const [selectedRows, setSelectedRows] = useState<GenericRecord[]>([]);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [optionMap, setOptionMap] = useState<Record<string, OptionItem[]>>({});
@@ -389,6 +464,20 @@ export const CrudPage: React.FC<{ resource: ResourceConfig }> = ({
     });
   };
 
+  const loadDetailRecord = async (id: string | number) => {
+    if (resource.detailLoader) {
+      return resource.detailLoader(id);
+    }
+
+    return (
+      await getResourceDetail(
+        resource.resourcePath,
+        id,
+        resource.detailParams,
+      )
+    ).result;
+  };
+
   const openEditModal = async (record: GenericRecord) => {
     setModalMode('edit');
     setCurrentRecord(record);
@@ -399,21 +488,29 @@ export const CrudPage: React.FC<{ resource: ResourceConfig }> = ({
     });
 
     try {
-      const detail = resource.detailLoader
-        ? await resource.detailLoader(record[idField])
-        : (
-            await getResourceDetail(
-              resource.resourcePath,
-              record[idField],
-              resource.detailParams,
-            )
-          ).result;
+      const detail = await loadDetailRecord(record[idField]);
       formRef.current?.setFieldsValue(toFormValues(detail, resource.fields));
     } catch (error) {
       messageApi.error('加载详情失败，请稍后重试');
       throw error;
     } finally {
       setLoadingDetail(false);
+    }
+  };
+
+  const openDetailDrawer = async (record: GenericRecord) => {
+    setDetailOpen(true);
+    setDetailRecord(undefined);
+    setDetailLoading(true);
+
+    try {
+      const detail = await loadDetailRecord(record[idField]);
+      setDetailRecord(detail);
+    } catch (error) {
+      messageApi.error('加载详情失败，请稍后重试');
+      throw error;
+    } finally {
+      setDetailLoading(false);
     }
   };
 
@@ -488,17 +585,22 @@ export const CrudPage: React.FC<{ resource: ResourceConfig }> = ({
         render: (_, record) => {
           const value = record[field.name];
           if (Array.isArray(value)) {
+            const labels = value
+              .map((item) =>
+                formatSingleFieldValue(field, item, optionMap, treeOptionMap),
+              )
+              .filter((item) => item !== '-');
             return value.length ? (
               <Space size={[4, 4]} wrap>
-                {value.map((item) => (
-                  <Tag key={`${field.name}-${item}`}>{String(item)}</Tag>
+                {labels.map((item) => (
+                  <Tag key={`${field.name}-${item}`}>{item}</Tag>
                 ))}
               </Space>
             ) : (
               '-'
             );
           }
-          const text = renderSummaryValue(value);
+          const text = formatFieldValue(field, value, optionMap, treeOptionMap);
           if (text === '-') {
             return text;
           }
@@ -528,10 +630,23 @@ export const CrudPage: React.FC<{ resource: ResourceConfig }> = ({
     title: '操作',
     key: 'option',
     valueType: 'option',
-    width: 220,
+    width: 280,
     fixed: 'right',
     render: (_, record) => {
       const actions: React.ReactNode[] = [];
+
+      if (resource.allowView !== false) {
+        actions.push(
+          <a
+            key="detail"
+            onClick={() => {
+              void openDetailDrawer(record);
+            }}
+          >
+            详情
+          </a>,
+        );
+      }
 
       if (resource.allowEdit !== false) {
         actions.push(
@@ -807,18 +922,61 @@ export const CrudPage: React.FC<{ resource: ResourceConfig }> = ({
         {loadingDetail && modalMode === 'edit' ? (
           <Result status="info" title="正在加载详情..." />
         ) : (
-          resource.fields
-            .filter((item) => !item.hideInForm)
-            .map((item) =>
-              renderFormField(
-                item,
-                modalMode,
-                optionMap,
-                treeOptionMap,
-              ),
-            )
+          getOrderedFormFields(resource.fields).map((item) =>
+            renderFormField(
+              item,
+              modalMode,
+              optionMap,
+              treeOptionMap,
+            ),
+          )
         )}
       </ModalForm>
+
+      <Drawer
+        open={detailOpen}
+        width={720}
+        title={`${resource.title}详情`}
+        destroyOnClose
+        onClose={() => {
+          setDetailOpen(false);
+          setDetailRecord(undefined);
+        }}
+      >
+        {detailLoading ? (
+          <Result status="info" title="正在加载详情..." />
+        ) : !detailRecord ? (
+          <Result status="info" title="暂无详情数据" />
+        ) : (
+          <Descriptions bordered size="small" column={2}>
+            {resource.fields
+              .filter((field) => field.type !== 'password')
+              .map((field) => (
+                <Descriptions.Item
+                  key={field.name}
+                  label={field.label}
+                  span={isFullRowField(field) ? 2 : 1}
+                >
+                  <Typography.Paragraph
+                    style={{ marginBottom: 0 }}
+                    ellipsis={
+                      field.type === 'textarea'
+                        ? { rows: 3, tooltip: true }
+                        : undefined
+                    }
+                  >
+                    {formatFieldValue(
+                      field,
+                      detailRecord[field.name],
+                      optionMap,
+                      treeOptionMap,
+                    )}
+                  </Typography.Paragraph>
+                </Descriptions.Item>
+              ))}
+          </Descriptions>
+        )}
+      </Drawer>
     </PageContainer>
   );
 };

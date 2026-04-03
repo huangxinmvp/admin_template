@@ -1,0 +1,6 @@
+# Local and pilot operational artifacts
+.env
+.env.*
+*.pid
+*.log
+deploy/pilot/*.env
